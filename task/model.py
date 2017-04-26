@@ -2,7 +2,6 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 import datetime
-import string
 from nltk.corpus import stopwords
 
 import query_processing
@@ -41,21 +40,29 @@ start_exe=datetime.datetime.now()
 for thread in root.findall("Thread"):
     start = datetime.datetime.now()
     dict_score={}
+    list_result=[]
     
     #Accessing the Question in a Thread
     
     for question in thread.findall('RelQuestion'):
         Question_ID=question.attrib['RELQ_ID']
-        Question_text_retrieved=question.find('RelQBody').text
+        Question_text_retrieved=question.find('RelQBody').text  
+        
+        
 
         #Removing the punctuation in the Question
-        translate_table = dict((ord(char), None) for char in string.punctuation)   
+        
+        import string
+        translate_table = dict((ord(char), None) for char in string.punctuation)
+
+        #Removing the empty questions
+
+        if not Question_text_retrieved:
+            continue
+
         Question_text=Question_text_retrieved.translate(translate_table)
         
-        #Removing the empty questions
         
-        if not Question_text:
-            continue
             
         print ("Accessing the Question ID ",Question_ID)
 
@@ -81,6 +88,7 @@ for thread in root.findall("Thread"):
         Answer_ID=each_answer.attrib['RELC_ID']
         Answer_text_retrieved=each_answer.find('RelCText').text
 
+        import string
         translate_table_2 = dict((ord(char), None) for char in string.punctuation)
         Answer_text=Answer_text_retrieved.translate(translate_table_2)
         
@@ -176,13 +184,21 @@ for thread in root.findall("Thread"):
     
     Cosine_Score=Comments_weights_corrected.sum(axis=0)
     scoreee=list(Cosine_Score)
+    #print (scoreee)
     dictionary = dict(zip(comments_ids, scoreee))
     scores.update(dictionary)
+ 
+    for item in sorted(dictionary.keys()):
+        list_3=[Question_ID,item,dictionary[item]]
+        list_result.append(list_3)              
     
-    with open('resultfile.relevancy', 'a') as fileOut:
-        for item in dictionary.keys():
-            print(Question_ID,item,dictionary[item],sep='\t',file=fileOut)        
+    
+    tmp=sorted(list_result,key=lambda x:float(x[2]),reverse=True)
+    with open('result5.pred', 'a') as fileOut:
+        for i in sorted([j+[i+1] for i,j in enumerate(tmp)],key=lambda x:(x[0],int(x[1].split('C')[-1]))):
+            print("\t".join(map(str,i)),file=fileOut)
 
+print ("PRED file is updated")
 end_exe=datetime.datetime.now()
 total=end_exe-start_exe
 print (total.total_seconds(),"seconds")
