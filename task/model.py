@@ -27,7 +27,7 @@ from general_processing import wordsets
 
 
 
-tree = ET.parse('small_train_2.xml')
+tree = ET.parse('SemEval2016-Task3-CQA-QL-dev-subtaskA.xml')
 root = tree.getroot()
 
 #Initializing the scores
@@ -81,7 +81,7 @@ for thread in root.findall("Thread"):
             continue
         
     #Comments    
-    print ("Accessing the comments for ",Question_ID)         
+    print ("Accessing the comments for ",Question_ID)
     comments=[]    
     comments_ids=[]
     
@@ -188,15 +188,19 @@ for thread in root.findall("Thread"):
     #print (scoreee)
     dictionary = dict(zip(comments_ids, scoreee))
     scores.update(dictionary)
- 
+
+    i = 0
     for item in sorted(dictionary.keys()):
-        list_3=[Question_ID,item,dictionary[item]]
-        list_result.append(list_3)              
+        list_3=[Question_ID,item,i,dictionary[item],"true"]
+        list_result.append(list_3)
+        i = i + 1
     
     
     tmp=sorted(list_result,key=lambda x:float(x[2]),reverse=True)
-    with open('result5.pred', 'a') as fileOut:
-        for i in sorted([j+[i+1] for i,j in enumerate(tmp)],key=lambda x:(x[0],int(x[1].split('C')[-1]))):
+    with open('result6.pred', 'a') as fileOut:
+        #h = [j + [i + 1] for i, j in enumerate(tmp)]
+        sorted_ar = sorted(tmp,key=lambda x:(x[0],int(x[1].split('C')[-1])))
+        for i in sorted_ar:
             print("\t".join(map(str,i)),file=fileOut)
 
 print ("PRED file is updated")
