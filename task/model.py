@@ -2,7 +2,6 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 import datetime
-import string
 from nltk.corpus import stopwords
 
 import query_processing
@@ -27,7 +26,7 @@ from general_processing import wordsets
 
 
 
-tree = ET.parse('small_train_2.xml')
+tree = ET.parse('SemEval2016-Task3-CQA-QL-dev-subtaskA.xml')
 root = tree.getroot()
 
 #Initializing the scores
@@ -53,7 +52,7 @@ for thread in root.findall("Thread"):
 
         #Removing the punctuation in the Question
         
-        
+        import string
         translate_table = dict((ord(char), None) for char in string.punctuation)
 
         #Removing the empty questions
@@ -89,7 +88,7 @@ for thread in root.findall("Thread"):
         Answer_ID=each_answer.attrib['RELC_ID']
         Answer_text_retrieved=each_answer.find('RelCText').text
 
-        
+        import string
         translate_table_2 = dict((ord(char), None) for char in string.punctuation)
         Answer_text=Answer_text_retrieved.translate(translate_table_2)
         
@@ -176,16 +175,19 @@ for thread in root.findall("Thread"):
     columns = Comments_weights.columns[:]
     for item in columns:
         Comments_weights[item] *= norm_query['nor_q']
-        
+
+   
     #Replacing the NaN values with Zero's
     
     Comments_weights_corrected=Comments_weights.fillna('0')
 
-    #Query - Documents score
+    #Converting to Float datatype - This is to avoid the empty cosine score
+    Check=Comments_weights_corrected.convert_objects(convert_numeric=True)
+
+    Cosine_Score=Check.sum(axis=0)
     
-    Cosine_Score=Comments_weights_corrected.sum(axis=0)
     scoreee=list(Cosine_Score)
-    #print (scoreee)
+    
     dictionary = dict(zip(comments_ids, scoreee))
     scores.update(dictionary)
  
@@ -195,9 +197,10 @@ for thread in root.findall("Thread"):
     
     
     tmp=sorted(list_result,key=lambda x:float(x[2]),reverse=True)
-    with open('result5.pred', 'a') as fileOut:
+    with open('result_updated.pred', 'a') as fileOut:
         for i in sorted([j+[i+1] for i,j in enumerate(tmp)],key=lambda x:(x[0],int(x[1].split('C')[-1]))):
             print("\t".join(map(str,i)),file=fileOut)
+            #print("\t".join(map(str,i)))
 
 print ("PRED file is updated")
 end_exe=datetime.datetime.now()
