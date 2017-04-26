@@ -2,6 +2,7 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 import datetime
+import string
 from nltk.corpus import stopwords
 
 import query_processing
@@ -52,7 +53,7 @@ for thread in root.findall("Thread"):
 
         #Removing the punctuation in the Question
         
-        import string
+        
         translate_table = dict((ord(char), None) for char in string.punctuation)
 
         #Removing the empty questions
@@ -88,7 +89,7 @@ for thread in root.findall("Thread"):
         Answer_ID=each_answer.attrib['RELC_ID']
         Answer_text_retrieved=each_answer.find('RelCText').text
 
-        import string
+        
         translate_table_2 = dict((ord(char), None) for char in string.punctuation)
         Answer_text=Answer_text_retrieved.translate(translate_table_2)
         
