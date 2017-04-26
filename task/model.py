@@ -181,11 +181,13 @@ for thread in root.findall("Thread"):
     
     Comments_weights_corrected=Comments_weights.fillna('0')
 
-    #Query - Documents score
-    
-    Cosine_Score=Comments_weights_corrected.sum(axis=0)
+    #Converting to Float datatype - This is to avoid the empty cosine score
+    Check=Comments_weights_corrected.convert_objects(convert_numeric=True)
+
+    Cosine_Score=Check.sum(axis=0)
+
     scoreee=list(Cosine_Score)
-    #print (scoreee)
+
     dictionary = dict(zip(comments_ids, scoreee))
     scores.update(dictionary)
 
