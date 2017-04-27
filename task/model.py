@@ -65,7 +65,7 @@ for thread in root.findall("Thread"):
         
         
             
-        print ("Accessing the Question ID ",Question_ID)
+        #print ("Accessing the Question ID ",Question_ID)
 
         #Tokenization of the Question
         Tokenized_Question=tokenization_question.tokenization(Question_text)
@@ -81,7 +81,7 @@ for thread in root.findall("Thread"):
             continue
         
     #Comments    
-    print ("Accessing the comments for ",Question_ID)
+    #print ("Accessing the comments for ",Question_ID)
     comments=[]    
     comments_ids=[]
     
@@ -204,6 +204,7 @@ for thread in root.findall("Thread"):
         sorted_ar = sorted(tmp,key=lambda x:(x[0],int(x[1].split('C')[-1])))
         for i in sorted_ar:
             print("\t".join(map(str,i)),file=fileOut)
+            #print("\t".join(map(str,i)))
 
 print ("PRED file is updated")
 end_exe=datetime.datetime.now()
