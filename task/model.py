@@ -7,27 +7,26 @@ from collections import defaultdict
 from nltk.corpus import stopwords
 
 import query_processing
-from query_processing import tokenization_question
+from query_processing import tokenization
 from query_processing import document_frequency
 from query_processing import idf_query_terms
 from query_processing import normalization_query
-from query_processing import stemmer_question
-from query_processing import stop_words_question
+from query_processing import stemmer
+from query_processing import stop_words
 from query_processing import tf_raw_query_terms
 from query_processing import tf_weight_terms
 
 import comments_processing
 from comments_processing import stemmer_comments
 from comments_processing import stop_words_comments
-from comments_processing import log_weight
+import processing as pr
 
 import general_processing
 from general_processing import unique_words_list
 from general_processing import words_counter
 from general_processing import wordsets
 from general_processing import word_counter_comment
-
-
+from sklearn.feature_extraction.text import CountVectorizer
 
 tree = ET.parse('SemEval2016-Task3-CQA-QL-dev-subtaskA.xml')
 root = tree.getroot()
@@ -71,13 +70,13 @@ for thread in root.findall("Thread"):
         #print ("Accessing the Question ID ",Question_ID)
 
         #Tokenization of the Question
-        Tokenized_Question=tokenization_question.tokenization(Question_text)
+        Tokenized_Question=tokenization.tokenization(Question_text)
         
         #Removing the stop words from the Question        
-        Question_Stop_words=stop_words_question.stop_words(Tokenized_Question)        
+        Question_Stop_words=stop_words.stop_words(Tokenized_Question)
         
         #Stemming the words in Question        
-        Stemmed_question=stemmer_question.stemmer(Question_Stop_words)
+        Stemmed_question=stemmer.stemmer(Question_Stop_words)
     
     if not Question_text:
             print ('skipping',Question_ID)
@@ -95,7 +94,7 @@ for thread in root.findall("Thread"):
         
         translate_table_2 = dict((ord(char), None) for char in string.punctuation)
         Answer_text=Answer_text_retrieved.translate(translate_table_2)
-        Tokenized_ans=tokenization_question.tokenization(Answer_text)
+        Tokenized_ans=tokenization.tokenization(Answer_text)
 
         comments.append(Tokenized_ans)
         comments_ids.append(Answer_ID)
@@ -114,9 +113,9 @@ for thread in root.findall("Thread"):
     
     
     #Calculating the raw terms in the comments
-    tf_raw=tf_raw_query_terms.tf_raw_query(Stemmed_question,wordset1) 
+    tf_raw=tf_raw_query_terms.tf_raw_query(Stemmed_question,wordset1)
     tf_wt=tf_weight_terms.tf_weight(tf_raw)
-    
+
     dl=list(wordset1)
     df_query=document_frequency.dfdfdf(dl,Comments_Stemming)
 
@@ -134,21 +133,7 @@ for thread in root.findall("Thread"):
     #Normalization   
     norm_query=normalization_query.norm_q(idf_query)
     
-    #Calculating the raw-terms for all the comments    
-    '''result=pd.DataFrame()
-    for item in Comments_Stemming:
-        comm_words=word_counter_comment.word_counter(item)
-
-        worddict_terms=dict.fromkeys(wordset1,0)
-        for items in item:
-            worddict_terms[items]+=1
-            df_com_c1=pd.DataFrame.from_dict([worddict_terms])
-        frames=[result,df_com_c1]
-        result = pd.concat(frames)
-    Comments_raw_terms=result.transpose()'''
-
-    from sklearn.feature_extraction.text import CountVectorizer
-
+    #Calculating the raw-terms for all the comments
     vect = CountVectorizer()
 
     text = pd.Series(Comments_Stemming).str.join(' ')
@@ -156,7 +141,7 @@ for thread in root.findall("Thread"):
 
     r = pd.DataFrame(X.toarray(), columns=vect.get_feature_names())
     Comments_raw_terms = r.transpose()
-    Comments_weights=Comments_raw_terms.applymap(log_weight.log_wt)
+    Comments_weights=Comments_raw_terms.applymap(pr.log_wt)
     
     #Adding the column names to the Dataframe
     Comments_weights.columns=["tf_doc_wt_1","tf_doc_wt_2","tf_doc_wt_3","tf_doc_wt_4","tf_doc_wt_5",
@@ -188,7 +173,6 @@ for thread in root.findall("Thread"):
     Comments_weights.drop(Comments_weights.columns[cols],axis=1,inplace=True)
     
     #product
-    
     columns = Comments_weights.columns[:]
     for item in columns:
         Comments_weights[item] *= norm_query['nor_q']
@@ -214,10 +198,10 @@ for thread in root.findall("Thread"):
         i = i + 1
     
     
-    tmp=sorted(list_result,key=lambda x:float(x[2]),reverse=True)
-    with open('result101.pred', 'a') as fileOut:
+    sorted_results=sorted(list_result,key=lambda x:float(x[2]),reverse=True)
+    with open('result105.pred', 'a') as fileOut:
         #h = [j + [i + 1] for i, j in enumerate(tmp)]
-        sorted_ar = sorted(tmp,key=lambda x:(x[0],int(x[1].split('C')[-1])))
+        sorted_ar = sorted(sorted_results,key=lambda x:(x[0],int(x[1].split('C')[-1])))
         for i in sorted_ar:
             print("\t".join(map(str,i)),file=fileOut)
             #print("\t".join(map(str,i)))
