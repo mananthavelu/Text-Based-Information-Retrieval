@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import datetime
 import string
+from collections import defaultdict
 from nltk.corpus import stopwords
 
 import query_processing
@@ -24,6 +25,7 @@ import general_processing
 from general_processing import unique_words_list
 from general_processing import words_counter
 from general_processing import wordsets
+from general_processing import word_counter_comment
 
 
 
@@ -47,24 +49,25 @@ for thread in root.findall("Thread"):
     
     for question in thread.findall('RelQuestion'):
         Question_ID=question.attrib['RELQ_ID']
-        Question_text_retrieved=question.find('RelQBody').text  
-        
-        
-
+        Question_text_retrieved = ""
+        #if question.find('RelQBody').text is not None:
+           # Question_text_retrieved= question.find('RelQBody').text
+        if question.find("RelQSubject").text is not None:
+            Question_text_retrieved += (' ' + question.find("RelQSubject").text)
+        if question.attrib["RELQ_CATEGORY"] is not None:
+            Question_text_retrieved += (' ' + question.attrib["RELQ_CATEGORY"])
         #Removing the punctuation in the Question
-        
-        
+
         translate_table = dict((ord(char), None) for char in string.punctuation)
 
         #Removing the empty questions
 
         if not Question_text_retrieved:
+            print('skipping', Question_ID)
             continue
 
         Question_text=Question_text_retrieved.translate(translate_table)
-        
-        
-            
+
         #print ("Accessing the Question ID ",Question_ID)
 
         #Tokenization of the Question
@@ -92,8 +95,9 @@ for thread in root.findall("Thread"):
         
         translate_table_2 = dict((ord(char), None) for char in string.punctuation)
         Answer_text=Answer_text_retrieved.translate(translate_table_2)
-        
-        comments.append(Answer_text)
+        Tokenized_ans=tokenization_question.tokenization(Answer_text)
+
+        comments.append(Tokenized_ans)
         comments_ids.append(Answer_ID)
 		
     #Removing stop words from the Comments   
@@ -131,15 +135,27 @@ for thread in root.findall("Thread"):
     norm_query=normalization_query.norm_q(idf_query)
     
     #Calculating the raw-terms for all the comments    
-    result=pd.DataFrame()
+    '''result=pd.DataFrame()
     for item in Comments_Stemming:
+        comm_words=word_counter_comment.word_counter(item)
+
         worddict_terms=dict.fromkeys(wordset1,0)
         for items in item:
             worddict_terms[items]+=1
             df_com_c1=pd.DataFrame.from_dict([worddict_terms])
         frames=[result,df_com_c1]
         result = pd.concat(frames)
-    Comments_raw_terms=result.transpose()
+    Comments_raw_terms=result.transpose()'''
+
+    from sklearn.feature_extraction.text import CountVectorizer
+
+    vect = CountVectorizer()
+
+    text = pd.Series(Comments_Stemming).str.join(' ')
+    X = vect.fit_transform(text)
+
+    r = pd.DataFrame(X.toarray(), columns=vect.get_feature_names())
+    Comments_raw_terms = r.transpose()
     Comments_weights=Comments_raw_terms.applymap(log_weight.log_wt)
     
     #Adding the column names to the Dataframe
@@ -199,7 +215,7 @@ for thread in root.findall("Thread"):
     
     
     tmp=sorted(list_result,key=lambda x:float(x[2]),reverse=True)
-    with open('result6.pred', 'a') as fileOut:
+    with open('result101.pred', 'a') as fileOut:
         #h = [j + [i + 1] for i, j in enumerate(tmp)]
         sorted_ar = sorted(tmp,key=lambda x:(x[0],int(x[1].split('C')[-1])))
         for i in sorted_ar:
