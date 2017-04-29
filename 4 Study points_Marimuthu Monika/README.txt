@@ -15,11 +15,21 @@ The folder is arranged in the following way and it has the following files:
 		- unsupervised_rank_marimuthu_ananthavelu.txt
 	3. report
 		- Report - Question-Comment Similarity_4 Study Points.docx
-5. 
+
 *************************************************************************************************
 *************************************************************************************************
 
 Running the Software:
+
+Running through Command line;
+
+	model>python setup.py
+
+Running through any other IDE;
+
+1. Locate the folder path for a given IDE
+2. Open setup.py
+3. Run
 
 model/setup.py is the main python implementation which acts as the source code and connects with other implementation files such as:
 
