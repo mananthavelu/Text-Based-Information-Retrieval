@@ -20,12 +20,16 @@ class Vsm:
             self.documents.append(self.process_text(answer_text))
 
     def evaluate(self):
-        # Creating a wordset for the comments
+
+        # Creating a wordset
         counter = prw.word_counter(self.documents)
         unique_words = prw.unique_words(counter)
         wordset = prw.wordset(self.query, unique_words)
 
+        # Calculating tf-idf for question
         table_query = self.calculate_tfidf_query(wordset)
+
+        # Normalization of tf-idf weights
         table_doc =  self.calculate_norm_doc()
 
         # Product
@@ -39,21 +43,28 @@ class Vsm:
         # Converting to Float datatype - This is to avoid the empty cosine score
         check = doc_wt_corrected.convert_objects(convert_numeric=True)
 
+        #Summing up the dot products of Question and comments
         cos_score = list(check.sum(axis=0))
 
+        #Combining the Comments ID's with the respective cosine score
         dictionary = dict(zip(self.documents_id, cos_score))
+
         scores = {}
         scores.update(dictionary)
 
         i = 1
         list_result = []
         for item in sorted(dictionary.keys()):
-            list_3 = [self.query_id, item, i, dictionary[item], "true"]
-            list_result.append(list_3)
+            list_inter = [self.query_id, item, i, dictionary[item], "true"]
+            list_result.append(list_inter)
             i = i + 1
+
+        # Returning the items of list with contents of output files before sorting 
         return sorted(list_result, key=lambda x: float(x[2]), reverse=True)
 
     def process_text(self, text):
+
+        # Removing the punctuations
         text_without_punc = text.translate(self.translate_table)
 
         # Tokenization of the Question
@@ -68,13 +79,17 @@ class Vsm:
         return stemmed_text
 
     def calculate_tfidf_query(self,wordset):
-        # Calculating the raw terms in the comments
+
+        # Calculating the raw terms in a question
         tf_raw = pr.tf_raw_query(self.query, wordset)
+        
+        #Converting the raw-terms into weights
         tf_wt = pr.tf_weight(tf_raw)
 
+        # Calculating the document frequency for terms in terms index
         df_query = pr.calculate_document_frequency(list(wordset), self.query)
 
-        # Appending the tf-raw, tf-wt, df into a dataframe        
+        # Creating a Dataframe with tf-raw, tf-wt, df as columns
         dframe = pd.DataFrame.from_dict([tf_raw, tf_wt, df_query], orient='columns')
         df = dframe.transpose()
         summary_of_results = df.rename(columns={0: 'tf_raw', 1: 'tf_weight', 2: 'df'})
