@@ -28,7 +28,7 @@ class Vsm:
         table_query = self.calculate_tfidf_query(wordset)
         table_doc =  self.calculate_norm_doc()
 
-        # product
+        # Product
         columns = table_doc.columns[:]
         for item in columns:
             table_doc[item] *= table_query['nor_q']
@@ -45,7 +45,7 @@ class Vsm:
         scores = {}
         scores.update(dictionary)
 
-        i = 0
+        i = 1
         list_result = []
         for item in sorted(dictionary.keys()):
             list_3 = [self.query_id, item, i, dictionary[item], "true"]
