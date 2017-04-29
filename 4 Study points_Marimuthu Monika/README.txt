@@ -3,16 +3,19 @@
 
 This folder has all the files which all are related to the implementation of Vector Space Model.
 
-It has the following files:
+The folder is arranged in the following way and it has the following files:
 
-	1. model/setup.py	
-
-	2. model/vsm.py  
-
-	3. model/processing.py
-
-	4. model/processing_word.py
-
+	1. model
+		- setup.py	
+		- vsm.py  
+        - processing.py
+		- processing_word.py
+		- test_input.xml
+	2. output
+		- unsupervised_rank_marimuthu_ananthavelu.txt
+	3. report
+		- Report - Question-Comment Similarity_4 Study Points.docx
+5. 
 *************************************************************************************************
 *************************************************************************************************
 
