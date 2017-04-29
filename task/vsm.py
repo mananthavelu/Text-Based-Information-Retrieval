@@ -103,12 +103,11 @@ class Vsm:
         return table_query
 
     def calculate_norm_doc(self):
+
         # Calculating the raw-terms for all the comments
         vect = CountVectorizer()
-
         text = pd.Series(self.documents).str.join(' ')
         X = vect.fit_transform(text)
-
         r = pd.DataFrame(X.toarray(), columns=vect.get_feature_names())
         doc_raw_terms = r.transpose()
         doc_weights = doc_raw_terms.applymap(pr.log_wt)
@@ -126,7 +125,7 @@ class Vsm:
             doc_weights[s] = norm_q_d
             counter += 1
 
-        # Keeping the column weights
+        # Keeping the column weights and removing the remaining columns
         cols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         doc_weights.drop(doc_weights.columns[cols], axis=1, inplace=True)
         return doc_weights
