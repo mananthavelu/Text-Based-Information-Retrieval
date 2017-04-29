@@ -23,7 +23,8 @@ Running the Software:
 
 Running through Command line;
 
-	model>python setup.py
+1. Go to the folder model
+2. run python setup.py
 
 Running through any other IDE;
 
