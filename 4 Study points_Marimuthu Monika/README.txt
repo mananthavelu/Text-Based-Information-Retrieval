@@ -11,6 +11,8 @@ The folder is arranged in the following way and it has the following files:
         - processing.py
 		- processing_word.py
 		- test_input.xml
+		test_sets
+			- model/test_sets/subset_train_1
 	2. output
 		- unsupervised_rank_marimuthu_ananthavelu.txt
 	3. report
@@ -23,7 +25,7 @@ Running the Software:
 
 Running through Command line;
 
-1. Go to the folder model
+1. Go to the folder 'model'
 2. run python setup.py
 
 Running through any other IDE;
@@ -43,7 +45,7 @@ model/processing_word.py - which has the functions to process the words which al
 *************************************************************************************************
 *************************************************************************************************
 
-Other enclosures:
+Enclosures description:
 
 1. report/Report - Question-Comment Similarity_4 Study Points.docx - Detailed report in implementing the Vector Space Model for Question and Comment similarity.
 
