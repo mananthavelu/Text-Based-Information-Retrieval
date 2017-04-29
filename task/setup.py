@@ -34,7 +34,7 @@ for thread in root.findall("Thread"):
     # Saving to an output text file
 
     sorted_results = vsm.evaluate()
-    with open('unsupervised_rank_marimuthu_ananthavelu123.txt', 'a') as fileOut:
+    with open('unsupervised_rank_marimuthu_ananthavelu.txt', 'a') as fileOut:
         sorted_ar = sorted(sorted_results, key=lambda x: (x[0], int(x[1].split('C')[-1])))
         for i in sorted_ar:
             print("\t".join(map(str, i)), file=fileOut)

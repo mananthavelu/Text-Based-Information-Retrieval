@@ -72,8 +72,7 @@ def calculate_document_frequency(ww,dd):
             else:
                 pass
             dict_dfdf[item]=co
-     return dict_dfdf
-
+    return dict_dfdf
 
 # Initialization with Zeros
 def tf_raw_query(query_strings,wordset):
