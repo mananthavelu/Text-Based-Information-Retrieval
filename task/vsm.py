@@ -6,7 +6,6 @@ import processing_word as prw
 
 from sklearn.feature_extraction.text import CountVectorizer
 
-
 class Vsm:
 
     def __init__(self,question, question_id,comments):
@@ -17,7 +16,6 @@ class Vsm:
         self.documents_id = []
         for answer in comments:
             self.documents_id.append(answer.attrib['RELC_ID'])
-
             answer_text = answer.find('RelCText').text
             self.documents.append(self.process_text(answer_text))
 
@@ -34,8 +32,8 @@ class Vsm:
         columns = table_doc.columns[:]
         for item in columns:
             table_doc[item] *= table_query['nor_q']
-        # Replacing the NaN values with Zero's
 
+        # Replacing the NaN values with Zero's
         doc_wt_corrected = table_doc.fillna('0')
 
         # Converting to Float datatype - This is to avoid the empty cosine score
@@ -57,10 +55,13 @@ class Vsm:
 
     def process_text(self, text):
         text_without_punc = text.translate(self.translate_table)
+
         # Tokenization of the Question
         tokenized_text = pr.tokenization(text_without_punc)
+
         # Removing the stop words from the Question
         text_without_stop_w = pr.stop_words(tokenized_text)
+
         # Stemming the words in Question
         stemmed_text = pr.stemmer(text_without_stop_w)
 
@@ -73,7 +74,7 @@ class Vsm:
 
         df_query = pr.calculate_document_frequency(list(wordset), self.query)
 
-        # Appending the tf-raw, tf-wt, df into a dataframe
+        # Appending the tf-raw, tf-wt, df into a dataframe        
         dframe = pd.DataFrame.from_dict([tf_raw, tf_wt, df_query], orient='columns')
         df = dframe.transpose()
         summary_of_results = df.rename(columns={0: 'tf_raw', 1: 'tf_weight', 2: 'df'})
