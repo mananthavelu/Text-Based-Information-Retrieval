@@ -35,6 +35,8 @@ Other enclosures:
 
 2.output file for the 'test_input.xml' - unsupervised_rank_marimuthu_ananthavelu.txt
 
+3.model/test_sets/subset_train_1 - This set is created from the given training set to validate the accuracy of implementation in a small scale and expanding to the whole dataset. 
+
 *************************************************************************************************
 *************************************************************************************************
 
